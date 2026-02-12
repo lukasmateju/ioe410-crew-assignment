@@ -1,0 +1,5 @@
+airport_id,city,is_base
+DTW,Detroit,1
+JFK,New York,1
+ORD,Chicago,0
+ATL,Atlanta,0
