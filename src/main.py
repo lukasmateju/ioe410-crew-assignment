@@ -1,13 +1,16 @@
 """
 IOE 410: Airline Crew Assignment Optimization Project
-Names: Megan Gottfried, Lukas Mateju
-File: main.py
 ------------------------------------------------------
+File: main.py \n
 Main driver program for optimation model.
 """
 
 import pandas as pd
 from model import build_model
+
+import config
+import model
+import utils
 
 
 def main():
@@ -22,6 +25,3 @@ def main():
             if v.x > 0.5:
                 print(v.varName, v.x)
 
-
-if __name__ == "__main__":
-    main()

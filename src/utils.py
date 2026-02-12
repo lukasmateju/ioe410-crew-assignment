@@ -1,8 +1,7 @@
 """
 IOE 410: Airline Crew Assignment Optimization Project
-Names: Megan Gottfried, Lukas Mateju
-File: utils.py
 ------------------------------------------------------
+File: utils.py \n
 Helper functions for results output, file read-in, and visualization
 code for optimization model.
 """
