@@ -1,5 +1,0 @@
-flight_id,plane_type,origin,destination,dep_min,arr_min
-F001,737,DTW,JFK,480,600
-F002,737,JFK,ORD,720,840
-F003,737,ORD,DTW,960,1080
-F004,737,DTW,ATL,540,660

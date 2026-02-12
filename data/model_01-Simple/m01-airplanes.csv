@@ -1,8 +1,0 @@
-aircraft_id,aircraft_type,flight_crew,cabin_crew_min,cabin_crew_max
-B737,Boeing 737,2,3,5
-B777,Boeing 777,3,7,10
-B787,Boeing 787,2,7,10
-A320,Airbus A320,2,3,5
-A330,Airbus A330,2,6,9
-A350,Airbus A350,2,8,12
-A380,Airbus A380,3,15,20
