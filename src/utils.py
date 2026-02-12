@@ -1,9 +1,8 @@
+# IOE 410: Airline Crew Assignment Optimization Project (Megan Gottfried, Lukas Mateju)
 """
-IOE 410: Airline Crew Assignment Optimization Project
+**utils.py**
 ------------------------------------------------------
-File: utils.py \n
-Helper functions for results output, file read-in, and visualization
-code for optimization model.
+Helper functions for results output, file read-in, and visualization code for optimization model.
 """
 
 import pandas as pd

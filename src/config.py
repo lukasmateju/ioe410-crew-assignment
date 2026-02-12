@@ -1,9 +1,8 @@
+# IOE 410: Airline Crew Assignment Optimization Project (Megan Gottfried, Lukas Mateju)
 """
-IOE 410: Airline Crew Assignment Optimization Project
+**config.py**
 ------------------------------------------------------
-File: config.py \n
-Global configuration parameters for the crew assignment model. All
-modafiable variables and input files are set and changed here.
+Global configuration parameters for the crew assignment model. All modafiable variables and input files are set and changed here.
 """
 
 # Input Files

@@ -1,7 +1,7 @@
+# IOE 410: Airline Crew Assignment Optimization Project (Megan Gottfried, Lukas Mateju)
 """
-IOE 410: Airline Crew Assignment Optimization Project
+**main.py**
 ------------------------------------------------------
-File: main.py \n
 Main driver program for optimation model.
 """
 

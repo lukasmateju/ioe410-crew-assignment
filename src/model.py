@@ -1,9 +1,8 @@
+# IOE 410: Airline Crew Assignment Optimization Project (Megan Gottfried, Lukas Mateju)
 """
-IOE 410: Airline Crew Assignment Optimization Project
+**model.py**
 ------------------------------------------------------
-File: model.py \n
-Main modeling functions and gurobi optimation code along with 
-additional helper functions.
+Main modeling functions and gurobi optimation code along with a few additional helper functions.
 """
 
 from gurobipy import Model, GRB, quicksum
@@ -30,3 +29,8 @@ def build_model(flights):
     m.setObjective(quicksum(Y[i] for i in I), GRB.MINIMIZE)
 
     return m
+
+
+
+
+
