@@ -6,13 +6,13 @@ Global configuration parameters for the crew assignment model. All modafiable va
 """
 
 # Input Files
-IN_FLIGHTS = "dummy_file.csv"
-IN_AIRPORTS = "dummy_file.csv"
-IN_AIRPLANES = "dummy_file.csv"
+IN_FLIGHTS   = "../data/flight-schedules/F01-simple.csv"
+IN_AIRPORTS  = "../data/flight-schedules/airports.csv"
+IN_AIRPLANES = "../data/flight-schedules/airplanes.csv"
 
 # Crew Behavior Settings
-MAX_SHIFT_HOURS = 11
-MIN_TRANSFER_TIME = 1
+MAX_SHIFT_HOURS = 11 * 60
+MIN_TRANSFER_TIME = 1 * 60
 ENFORCE_SAME_START_END = False
 MULTIPLE_AIRPLANE_TYPES = False
 MULTIPLE_CREW_TYPES = False

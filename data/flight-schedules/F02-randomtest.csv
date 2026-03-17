@@ -1,11 +1,11 @@
-flight_id,plane_type,origin,destination,dep_min,arr_min,distance_mi,duration
-F001,B737,DFW,JFK,5,157,1389,152
-F002,B737,ORD,LAX,99,289,1741,190
-F003,B737,DFW,ORD,299,386,802,87
-F004,B737,DFW,LAX,469,603,1232,134
-F005,B737,LAX,DFW,802,936,1232,134
-F006,B737,ORD,LAX,841,1031,1741,190
-F007,B737,ORD,DTW,927,953,234,26
-F008,B737,JFK,DTW,1044,1099,508,55
-F009,B737,ORD,JFK,1266,1347,738,81
-F010,B737,DTW,ORD,1377,1403,234,26
+flight_id, plane_type, origin, destination, dep_min, arr_min, distance_mi, duration
+F001     , B737      , DFW   , JFK        ,       5,     157,        1389,      152
+F002     , B737      , ORD   , LAX        ,      99,     289,        1741,      190
+F003     , B737      , DFW   , ORD        ,     299,     386,         802,       87
+F004     , B737      , DFW   , LAX        ,     469,     603,        1232,      134
+F005     , B737      , LAX   , DFW        ,     802,     936,        1232,      134
+F006     , B737      , ORD   , LAX        ,     841,    1031,        1741,      190
+F007     , B737      , ORD   , DTW        ,     927,     953,         234,       26
+F008     , B737      , JFK   , DTW        ,    1044,    1099,         508,       55
+F009     , B737      , ORD   , JFK        ,    1266,    1347,         738,       81
+F010     , B737      , DTW   , ORD        ,    1377,    1403,         234,       26

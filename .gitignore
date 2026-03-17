@@ -21,5 +21,8 @@ venv/
 # Gurobi logs
 *.log
 
-# Results folder
-results/
+# Config Files
+.flake8
+
+# Output Folder
+output/

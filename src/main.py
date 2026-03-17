@@ -5,23 +5,36 @@
 Main driver program for optimation model.
 """
 
-import pandas as pd
-from model import build_model
+#import pandas as pd
 
-import config
+#import utils
+#import config
+import sys
 import model
-import utils
+
+# --- Output toggles ---
+SHOW_CREW_COUNT  = True
+SHOW_ROUTES      = True
+SHOW_SHIFT_TIMES = False
+SAVE_OUTPUT      = "--save" in sys.argv
 
 
-def main():
+# --- Run ---
+model.run(SHOW_CREW_COUNT, SHOW_ROUTES, SHOW_SHIFT_TIMES, SAVE_OUTPUT)
 
-    flights = pd.read_csv("../data/flights.csv")
 
-    model = build_model(flights)
-    model.optimize()
 
-    if model.status == 2:
-        for v in model.getVars():
-            if v.x > 0.5:
-                print(v.varName, v.x)
 
+
+
+#def main():
+#
+#    flights = pd.read_csv("../data/flights.csv")
+#
+#    model = build_model(flights)
+#    model.optimize()
+#
+#    if model.status == 2:
+#        for v in model.getVars():
+#            if v.x > 0.5:
+#                print(v.varName, v.x)
