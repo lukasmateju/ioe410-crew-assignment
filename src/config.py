@@ -6,7 +6,7 @@ Global configuration parameters for the crew assignment model. All modafiable va
 """
 
 # Input Files
-IN_FLIGHTS   = "../data/flight-schedules/F01-simple.csv"
+IN_FLIGHTS   = "../data/flight-schedules/F03-largerandom.csv"
 IN_AIRPORTS  = "../data/flight-schedules/airports.csv"
 IN_AIRPLANES = "../data/flight-schedules/airplanes.csv"
 
@@ -23,4 +23,3 @@ MULTIPLE_CREW_TYPES = False
 #  - Balanced workload (Each crew member needs x number of hours at a minimum to be scheduled)
 #  - Allow deadheads (Crew members can fly be on flights without working to get back to orgional airport)
 #  - Multiday schedule (Add in international and overnight flights with additional crew restrictions)
-

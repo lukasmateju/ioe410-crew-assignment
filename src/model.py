@@ -32,7 +32,7 @@ def build_network(F):
         # Compatibility arcs
         for j in range(len(F)):
             if i != j:
-                if (F[i].destination == F[j].origin and F[i].arr_min + config.MIN_TRANSFER_TIME <= F[j].dep_min):
+                if (F[i].destination == F[j].origin and F[i].arr_min + config.MIN_TRANSFER_TIME <= F[j].dep_min and F[j].arr_min - F[i].dep_min <= config.MAX_SHIFT_HOURS):
                     G.add_edge(i, j)
 
         # Sink arcs
@@ -91,11 +91,18 @@ def run(show_crew_count, show_routes, show_shift_times, save_output):
     F = utils.load_flights(config.IN_FLIGHTS)
     #A = utils.load_airports(config.IN_AIRPORTS)
     #P = utils.load_airplanes(config.IN_AIRPLANES)
-
+    
     G = build_network(F)
     m, x, S = build_model(F, G)
-
     m.optimize()
+    
+    if m.status == gurobi.GRB.INFEASIBLE:
+        print("Computing IIS (Irreducible Infeasible Subsystem)...")
+        m.computeIIS()
+        print("Infeasible constraints:")
+        for c in m.getConstrs():
+            if c.IISConstr:
+                print(f"  {c.ConstrName}")
 
     if m.status == gurobi.GRB.OPTIMAL:
         if show_crew_count:

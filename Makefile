@@ -10,6 +10,9 @@ run:
 run-save:
 	cd $(SRC) && python main.py --save
 
+generate:
+	cd data && python dataRandom.py --flights "$(F)" --output "$(O)"
+
 clean:
 	find . -name "*.pyc" -delete
 	find . -name "__pycache__" -delete
