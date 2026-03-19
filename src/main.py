@@ -10,7 +10,7 @@ Main driver program for optimation model.
 #import utils
 #import config
 import sys
-import model
+import sc_model
 
 # --- Output toggles ---
 SHOW_CREW_COUNT  = True
@@ -20,10 +20,7 @@ SAVE_OUTPUT      = "--save" in sys.argv
 
 
 # --- Run ---
-model.run(SHOW_CREW_COUNT, SHOW_ROUTES, SHOW_SHIFT_TIMES, SAVE_OUTPUT)
-
-
-
+sc_model.run(SHOW_CREW_COUNT, SHOW_ROUTES, SHOW_SHIFT_TIMES, SAVE_OUTPUT)
 
 
 

@@ -1,8 +1,8 @@
 # IOE 410: Airline Crew Assignment Optimization Project (Megan Gottfried, Lukas Mateju)
 """
-**model.py**
+**sc_model.py**
 ------------------------------------------------------
-Main modeling functions and gurobi optimation code along with a few additional helper functions.
+Main set cover algoritm modeling functions and gurobi optimation code along with a few additional helper functions.
 """
 
 import networkx as nx

@@ -2,7 +2,7 @@ SRC = src
 DATA = data/flight-schedules
 
 check:
-	flake8 $(SRC)/model.py $(SRC)/utils.py $(SRC)/main.py $(SRC)/config.py
+	flake8 $(SRC)/sc_model.py $(SRC)/dp_model.py $(SRC)/utils.py $(SRC)/main.py $(SRC)/config.py
 
 run:
 	cd $(SRC) && python main.py
