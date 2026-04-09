@@ -32,7 +32,9 @@ def build_network(F):
         # Compatibility arcs
         for j in range(len(F)):
             if i != j:
-                if (F[i].destination == F[j].origin and F[i].arr_min + config.MIN_TRANSFER_TIME <= F[j].dep_min and F[j].arr_min - F[i].dep_min <= config.MAX_SHIFT_HOURS):
+                if (F[i].destination == F[j].origin and F[i].arr_min + config.MIN_TRANSFER_TIME <= F[j].dep_min 
+                    #and F[j].arr_min - F[i].dep_min <= config.MAX_SHIFT_HOURS
+                   ):
                     G.add_edge(i, j)
 
         # Sink arcs
