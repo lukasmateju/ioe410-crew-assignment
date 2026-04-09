@@ -39,7 +39,7 @@ The arc set $A$ contains three types of arcs:
 
 - **Source arcs** $(s, i)$ for all $i \in F$ — crew starts their shift at flight $i$
 - **Compatibility arcs** $(i, j)$ for $i, j \in F,\ i \neq j$, when:
-  - $b_i = e_j \quad \text{(destination of flight } i \text{ equals origin of flight } j\text{)}$
+  - $e_i = b_j \quad \text{(destination of flight } i \text{ equals origin of flight } j\text{)}$
   - $a_i + \delta \leq d_j \quad \text{(sufficient transfer time exists)}$
 - **Ending arcs** $(i, t)$ for all $i \in F$ — crew ends their shift after flight $i$
 
