@@ -71,13 +71,24 @@ Let $A = A^{\text{start}} \cup A^{\text{comp}} \cup A^{\text{end}}$, where:
 
 ## Decision Variables
 
-$$x_{ij} \in \{0, 1\}, \quad \forall (i,j) \in A$$
+- **Arc selection variable:** for every arc $(i,j) \in A$,
+  - $x_{ij} \in \{0,1\}$
 
-$$x_{ij} = \begin{cases} 1 & \text{crew operates flight } i \text{ and then continues to flight } j \\ & \quad (\text{if } j = t\text{, the shift ends after flight } i) \\ 0 & \text{otherwise} \end{cases}$$
+where
 
-$$S_i \geq 0, \quad S_i \in \mathbb{R}, \quad \forall i \in F$$
+- $x_{ij} = 1$ if a crew goes directly from node $i$ to node $j$
+- $x_{ij} = 0$ otherwise
 
-$S_i$ is the **clock-in / shift-start time** of the crew assigned to flight $i$ (i.e., the departure time of the *first* flight in that crew's sequence).
+Interpretation:
+
+- $x_{si} = 1$ means a crew starts with flight $i$
+- $x_{ij} = 1$ for $(i,j) \in A^{\text{comp}}$ means the same crew does flight $i$ and then flight $j$
+- $x_{it} = 1$ means the crew ends after flight $i$
+
+- **Shift-start-time variable:** for each flight $i \in F$,
+  - $S_i \ge 0$
+
+Here, $S_i$ is the start time of the crew assigned to flight $i$, meaning the departure time of the first flight in that crew’s sequence.
 
 ---
 
