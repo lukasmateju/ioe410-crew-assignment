@@ -35,6 +35,67 @@ The problem is modeled as a **minimum-flow / set-cover** problem on a directed c
 
 ### Arc Types
 
+\subsection*{3. Arc Set}
+
+We define three kinds of arcs.
+
+\paragraph{Source arcs}
+\[
+(s,i) \qquad \forall i \in F
+\]
+
+This means a crew starts its shift at flight \(i\).
+
+\paragraph{Compatibility arcs}
+\[
+(i,j) \qquad \forall i,j \in F,\; i \neq j
+\]
+
+where arc \((i,j)\) exists only if flight \(j\) can be flown immediately after flight \(i\), meaning:
+
+\[
+e_i = b_j
+\]
+
+and
+
+\[
+a_i + \delta \le d_j
+\]
+
+That is:
+\begin{itemize}
+    \item the destination of flight \(i\) matches the origin of flight \(j\),
+    \item and there is enough time to connect.
+\end{itemize}
+
+This is the corrected version of the compatibility rule.
+
+\paragraph{Ending arcs}
+\[
+(i,t) \qquad \forall i \in F
+\]
+
+This means a crew ends its shift after flight \(i\).
+
+Let
+\[
+A = A^{\text{start}} \cup A^{\text{comp}} \cup A^{\text{end}}
+\]
+
+where:
+\[
+A^{\text{start}} = \{(s,i) : i \in F\}
+\]
+
+\[
+A^{\text{comp}} = \{(i,j) : i,j \in F,\; i \neq j,\; e_i = b_j,\; a_i + \delta \le d_j\}
+\]
+
+\[
+A^{\text{end}} = \{(i,t) : i \in F\}
+\]
+
 The arc set $A$ contains three types of arcs:
 
 - **Source arcs** $(s, i)$ for all $i \in F$ — crew starts their shift at flight $i$
