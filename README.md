@@ -124,8 +124,9 @@ Together, constraints (2a) and (2b) force $S_i = d_i$ when $x_{si} = 1$.
 
 For flight-to-flight arcs only:
 
-- $S_j \le S_i + H(1 - x_{ij}) \qquad \forall (i,j) \in A^{\text{comp}}$
-- $S_j \ge S_i - H(1 - x_{ij}) \qquad \forall (i,j) \in A^{\text{comp}}$
+$$S_j \le S_i + H(1 - x_{ij}) \qquad \forall (i,j) \in A^{\text{comp}}$$
+
+$$S_j \ge S_i - H(1 - x_{ij}) \qquad \forall (i,j) \in A^{\text{comp}}$$
 
 If $x_{ij} = 1$, these force $S_j = S_i$.
 
@@ -135,7 +136,8 @@ So if the same crew does flight $i$ and then flight $j$, the crew’s shift-star
 
 The total shift length must not exceed $H$ minutes:
 
-- $a_i - S_i \le H \qquad \forall i \in F$
+$$a_i - S_i \le H \qquad \forall i \in F$$
+
 ---
 
 ## Complete Model Summary
@@ -152,9 +154,9 @@ $$S_i \leq d_i + H(1 - x_{si}), \quad \forall i \in F$$
 
 $$S_i \geq d_i - H(1 - x_{si}), \quad \forall i \in F$$
 
-$$S_j \leq S_i + H(1 - x_{ij}), \quad \forall (i,j) \in A$$
+$$S_j \le S_i + H(1 - x_{ij}) \qquad \forall (i,j) \in A^{\text{comp}}$$
 
-$$S_j \geq S_i - H(1 - x_{ij}), \quad \forall (i,j) \in A$$
+$$S_j \ge S_i - H(1 - x_{ij}) \qquad \forall (i,j) \in A^{\text{comp}}$$
 
 $$a_i - S_i \leq H, \quad \forall i \in F$$
 
