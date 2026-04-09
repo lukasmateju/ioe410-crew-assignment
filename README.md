@@ -122,18 +122,20 @@ Together, constraints (2a) and (2b) force $S_i = d_i$ when $x_{si} = 1$.
 
 ### 3. Shift Start Propagation
 
-When a crew operates flight $i$ and then flight $j$ (i.e., $x_{ij} = 1$), the shift start time carries forward: $S_j = S_i$:
+For flight-to-flight arcs only:
 
-$$S_j \leq S_i + H(1 - x_{ij}) \quad \forall (i,j) \in A$$
+- $S_j \le S_i + H(1 - x_{ij}) \qquad \forall (i,j) \in A^{\text{comp}}$
+- $S_j \ge S_i - H(1 - x_{ij}) \qquad \forall (i,j) \in A^{\text{comp}}$
 
-$$S_j \geq S_i - H(1 - x_{ij}) \quad \forall (i,j) \in A$$
+If $x_{ij} = 1$, these force $S_j = S_i$.
+
+So if the same crew does flight $i$ and then flight $j$, the crew’s shift-start time is the same for both flights. That makes sense because both flights belong to the same workday.
 
 ### 4. Maximum Shift Duration
 
-The total shift length (from clock-in to the end of the last flight) must not exceed $H$ minutes:
+The total shift length must not exceed $H$ minutes:
 
-$$a_i - S_i \leq H \quad \forall i \in F$$
-
+- $a_i - S_i \le H \qquad \forall i \in F$
 ---
 
 ## Complete Model Summary
