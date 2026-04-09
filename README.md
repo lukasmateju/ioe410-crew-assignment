@@ -111,7 +111,7 @@ $$S_j \geq S_i - H(1 - x_{ij}) \quad \forall (i,j) \in A$$
 
 ### 4. Maximum Shift Duration
 
-The total shift length — from clock-in to the end of the last flight — must not exceed $H$ minutes:
+The total shift length (from clock-in to the end of the last flight) must not exceed $H$ minutes:
 
 $$a_i - S_i \leq H \quad \forall i \in F$$
 
