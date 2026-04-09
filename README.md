@@ -59,6 +59,7 @@ Let $A = A^{\text{start}} \cup A^{\text{comp}} \cup A^{\text{end}}$, where:
 | $a_i$ | Arrival time of flight $i$ (minutes after 00:00), $i \in F$ |
 | $b_i$ | Origin airport of flight $i$, $i \in F$ |
 | $e_i$ | Destination airport of flight $i$, $i \in F$ |
+| $r_i$ | Number of crew needed for flight $i$, $i \in F$ |
 
 ### Constants
 
@@ -106,9 +107,9 @@ $$\min \sum_{i \in F} x_{si}$$
 
 Every flight must have exactly one crew arriving into it and exactly one crew departing from it:
 
-$$\sum_{\substack{k: (k,i) \in A}} x_{ki} = 1 \quad \forall i \in F$$
+$$\sum_{\substack{k: (k,i) \in A}} x_{ki} = r_i \quad \forall i \in F$$
 
-$$\sum_{\substack{k: (i,k) \in A}} x_{ik} = 1 \quad \forall i \in F$$
+$$\sum_{\substack{k: (i,k) \in A}} x_{ik} = r_i \quad \forall i \in F$$
 
 ### 2. Shift Start Initialization
 
