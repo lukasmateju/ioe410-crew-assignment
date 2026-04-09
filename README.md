@@ -103,9 +103,9 @@ $$\min \sum_{i \in F} x_{si}$$
 
 ## Constraints
 
-### 1. Flow Balance — Each Flight Covered Exactly Once
+### 1. Flow Balance — Each Flight Covered per Airplane Capicity
 
-Every flight must have exactly one crew arriving into it and exactly one crew departing from it:
+Every flight must have the exact number of crew arriving into it and the exact number of crew departing from it that each airplane requires:
 
 $$\sum_{\substack{k: (k,i) \in A}} x_{ki} = r_i \quad \forall i \in F$$
 
@@ -134,6 +134,12 @@ If $x_{ij} = 1$, these force $S_j = S_i$.
 So if the same crew does flight $i$ and then flight $j$, the crew’s shift-start time is the same for both flights. That makes sense because both flights belong to the same workday.
 
 ### 4. Maximum Shift Duration
+
+The total shift length must not exceed $H$ minutes:
+
+$$a_i - S_i \le H \qquad \forall i \in F$$
+
+### 5. Start and End at the Same Airport 
 
 The total shift length must not exceed $H$ minutes:
 
