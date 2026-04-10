@@ -10,17 +10,21 @@ IN_FLIGHTS   = "../data/flight-schedules/F03-largerandom.csv"
 IN_AIRPORTS  = "../data/flight-schedules/airports.csv"
 IN_AIRPLANES = "../data/flight-schedules/airplanes.csv"
 
-# Crew Behavior Settings
-MAX_SHIFT_TIME = 11 * 60 #FIX THIS NAME
+# Core Constraints
+MAX_SHIFT_TIME = 11 * 60
 MIN_TRANSFER_TIME = 1 * 60
-ENFORCE_SAME_START_END = False   #IMPLEMENT THIS
-MULTIPLE_CREW_TYPES = True       #IMPLEMENT THIS
-MULTIPLE_AIRPLANE_TYPES = False  #IMPLEMENT THIS
-CREW_RENDUNDANCY = True          #IMPLEMENT THIS
+
+# Model Settings
+SOLVE_PILOTS = True
+ALLOW_DEADHEADS = False
+ENFORCE_SAME_START_END_CABIN = False
+ENFORCE_SAME_START_END_PILOTS = False
+
+# Redundancy Buffer Multipliers
+CALLOUT_RATE = 0.0
+DELAY_BUFFER = 0
+
 # Other restriction ideas
 #  - Mandatory crew breaks (30 extra minutes without flight during shift)
-#  - Pilot certification restrictions (If using multiple crew types, pilots can only operate x types of planes)
-#  - Crew redundancy (If there will x number of crew that have to miss their shift, how many should be scheduled to avoid issues, ie. overload flight crews)
 #  - Balanced workload (Each crew member needs x number of hours at a minimum to be scheduled)
-#  - Allow deadheads (Crew members can fly be on flights without working to get back to orgional airport)
 #  - Multiday schedule (Add in international and overnight flights with additional crew restrictions)
