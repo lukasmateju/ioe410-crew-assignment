@@ -1,0 +1,2 @@
+flight_id,plane_type,origin,destination,dep_min,arr_min,distance_mi,duration
+F001,B737,DFW,ATL,360,440,730,80
