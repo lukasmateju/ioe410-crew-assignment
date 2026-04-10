@@ -110,8 +110,8 @@ def solve_pilots(F, P):
 
     return results
 
-def run(show_crew_count, show_routes, show_shift_times, save_output):
-    F = utils.load_flights(config.IN_FLIGHTS)
+def run(show_crew_count, show_routes, show_shift_times, save_output, flight_file=None):
+    F = utils.load_flights(flight_file or config.IN_FLIGHTS)
 
     # --- Cabin Crew ---
     print("=" * 50)

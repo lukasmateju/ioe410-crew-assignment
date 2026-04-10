@@ -18,20 +18,17 @@ SHOW_ROUTES      = True
 SHOW_SHIFT_TIMES = False
 SAVE_OUTPUT      = "--save" in sys.argv
 
+# --- Flight schedule (first non-flag argument, or config default) ---
+flight_file = None
+for arg in sys.argv[1:]:
+    if not arg.startswith("--"):
+        flight_file = arg
+        break
 
 # --- Run ---
-sc_model.run(SHOW_CREW_COUNT, SHOW_ROUTES, SHOW_SHIFT_TIMES, SAVE_OUTPUT)
+sc_model.run(SHOW_CREW_COUNT, SHOW_ROUTES, SHOW_SHIFT_TIMES, SAVE_OUTPUT, flight_file=flight_file)
 
 
+# --- Data Visualization ---
 
-#def main():
-#
-#    flights = pd.read_csv("../data/flights.csv")
-#
-#    model = build_model(flights)
-#    model.optimize()
-#
-#    if model.status == 2:
-#        for v in model.getVars():
-#            if v.x > 0.5:
-#                print(v.varName, v.x)
+
