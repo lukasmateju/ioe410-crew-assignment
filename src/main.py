@@ -27,12 +27,11 @@ results = sc_model.run(flight_file)
 if results is None:
     sys.exit(1)
 
+# Data Output and Visualization
+utils.assign_deadheads(results, flight_file)
 
-# Data Visualization
-
-
-
-
+utils.print_results(results)
 
 if save_output:
     utils.save_output(results)
+

@@ -16,12 +16,16 @@ MIN_TRANSFER_TIME = 1 * 60
 
 # Model Settings
 ALLOW_DEADHEADS = False
-ENFORCE_SAME_START_END_CABIN = False
-ENFORCE_SAME_START_END_PILOTS = False
+ENFORCE_SAME_START_END_CABIN = True
+ENFORCE_SAME_START_END_PILOTS = True
 
 # Redundancy Buffer Multipliers
 CALLOUT_RATE = 0.0
 DELAY_BUFFER = 0
+
+# Solver Settings
+TIME_LIMIT = 600
+MIP_GAP = 0.05
 
 # Other restriction ideas
 #  - Mandatory crew breaks (30 extra minutes without flight during shift)

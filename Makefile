@@ -1,21 +1,41 @@
 SRC  = src
 DATA = data/flight-schedules
 
-# Main Dataset Aliases
-SCHEDULES = simple normal edge stress real
-simple  := F01-simple.csv
-normal  := F02-normal.csv
-edge    := F03-edge.csv
-stress  := F04-stress.csv
-real    := F05-real.csv
+run-simple:
+	cd $(SRC) && python main.py ../$(DATA)/F01-simple.csv
+	
+run-normal:
+	cd $(SRC) && python main.py ../$(DATA)/F02-normal.csv
 
-resolve = $(if $($(F)),$($(F)),$(F))
+run-edge:
+	cd $(SRC) && python main.py ../$(DATA)/F03-edge.csv
 
-run:
-	@cd $(SRC) && python main.py ../$(DATA)/$(call resolve)
+run-stress:
+	cd $(SRC) && python main.py ../$(DATA)/F04-stress.csv
 
-run-save:
-	@cd $(SRC) && python main.py ../$(DATA)/$(call resolve) --save
+run-real:
+	cd $(SRC) && python main.py ../$(DATA)/F05-real.csv
+
+run-file:
+	cd $(SRC) && python main.py ../$(DATA)/$(F)
+
+save-simple:
+	cd $(SRC) && python main.py ../$(DATA)/F01-simple.csv --save
+
+save-normal:
+	cd $(SRC) && python main.py ../$(DATA)/F02-normal.csv --save
+
+save-edge:
+	cd $(SRC) && python main.py ../$(DATA)/F03-edge.csv --save
+
+save-stress:
+	cd $(SRC) && python main.py ../$(DATA)/F04-stress.csv --save
+
+save-real:
+	cd $(SRC) && python main.py ../$(DATA)/F05-real.csv --save
+
+save-file:
+	cd $(SRC) && python main.py ../$(DATA)/$(F) --save
 
 generate:
 	cd data && python dataRandom.py --flights "$(N)" --output "$(O)"
@@ -26,5 +46,7 @@ check:
 clean:
 	find . -name "*.pyc" -delete
 	find . -name "__pycache__" -delete
-
-.PHONY: run run-save generate check clean
+ 
+.PHONY: run-simple run-normal run-edge run-stress run-real run-file
+.PHONY: save-simple save-normal save-edge save-stress save-real save-file
+.PHONY: generate check clean
