@@ -6,16 +6,15 @@ Global configuration parameters for the crew assignment model. All modafiable va
 """
 
 # Input Files
-IN_FLIGHTS   = "../data/flight-schedules/F03-largerandom.csv"
-IN_AIRPORTS  = "../data/flight-schedules/airports.csv"
-IN_AIRPLANES = "../data/flight-schedules/airplanes.csv"
+IN_FLIGHTS   = "../data/flight-schedules/F01-simple.csv"
+IN_AIRPORTS  = "../data/airports.csv"
+IN_AIRPLANES = "../data/airplanes.csv"
 
 # Core Constraints
 MAX_SHIFT_TIME = 11 * 60
 MIN_TRANSFER_TIME = 1 * 60
 
 # Model Settings
-SOLVE_PILOTS = True
 ALLOW_DEADHEADS = False
 ENFORCE_SAME_START_END_CABIN = False
 ENFORCE_SAME_START_END_PILOTS = False

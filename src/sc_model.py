@@ -5,12 +5,12 @@
 Main set cover algoritm modeling functions and gurobi optimation code along with a few additional helper functions.
 """
 
+import os
 import networkx as nx
 import gurobipy as gurobi
 
 import config
 import utils
-
 
 def build_network(F, transfer_time):
     G = nx.DiGraph()
@@ -25,16 +25,19 @@ def build_network(F, transfer_time):
         G.add_edge("s", i)
 
         for j in range(len(F)):
+            # Arc does not start and end with the same flight
             if i != j:
-                if (F[i].destination == F[j].origin
-                    and F[i].arr_min + transfer_time <= F[j].dep_min):
+                # Destination airport of flight i is the same as the origin airport of flight j
+                # There is enough time to transfer from flight i to flight j
+                if (F[i].destination == F[j].origin and F[i].arr_min + transfer_time <= F[j].dep_min):
                     G.add_edge(i, j)
 
         G.add_edge(i, "t")
 
     return G
 
-def build_model(F, G, max_shift, model_name="CrewAssignment"):
+
+def build_model(F, G, max_shift, model_name):
     m = gurobi.Model(model_name)
     H = max_shift
 
@@ -46,29 +49,28 @@ def build_model(F, G, max_shift, model_name="CrewAssignment"):
     # Shift start variables S[i] for every flight node
     S = m.addVars(range(len(F)), lb=0.0, vtype=gurobi.GRB.CONTINUOUS, name="S")
 
-    # Flow balance constraint
+    # Flow Balance Constraint
     for i in range(len(F)):
-        m.addConstr(gurobi.quicksum(x[(u, i)] for u in G.predecessors(i)) == 1,
-                    name=f"flow_in_{i}")
-        m.addConstr(gurobi.quicksum(x[(i, v)] for v in G.successors(i)) == 1,
-                    name=f"flow_out_{i}")
+        m.addConstr(gurobi.quicksum(x[(u, i)] for u in G.predecessors(i)) == 1, name=f"Flow-Balance(in)_{i}")
+        m.addConstr(gurobi.quicksum(x[(i, v)] for v in G.successors(i)) == 1, name=f"Flow-Balance(out)_{i}")
 
-    # Shift start initialization constraint
+    # Shift Start Initialization Constraint
     for i in range(len(F)):
         d_i = G.nodes[i]['flight'].dep_min
-        m.addConstr(S[i] <= d_i + H * (1 - x[("s", i)]), name=f"sinit_ub_{i}")
-        m.addConstr(S[i] >= d_i - H * (1 - x[("s", i)]), name=f"sinit_lb_{i}")
+        
+        m.addConstr(S[i] <= d_i + H * (1 - x[("s", i)]), name=f"Shift-Start-Init(upper)_{i}")
+        m.addConstr(S[i] >= d_i - H * (1 - x[("s", i)]), name=f"Shift-Start-Init(lower)_{i}")
 
-    # Shift start propagation constraint
+    # Shift Start Propagation Constraint
     for (i, j) in G.edges():
         if i != "s" and j != "t":
-            m.addConstr(S[j] <= S[i] + H * (1 - x[(i, j)]), name=f"sprop_ub_{i}_{j}")
-            m.addConstr(S[j] >= S[i] - H * (1 - x[(i, j)]), name=f"sprop_lb_{i}_{j}")
+            m.addConstr(S[j] <= S[i] + H * (1 - x[(i, j)]), name=f"Shift-Start-Prop(upper)_{i}_{j}")
+            m.addConstr(S[j] >= S[i] - H * (1 - x[(i, j)]), name=f"Shift-Start-Prop(lower)_{i}_{j}")
 
-    # Maximum shift duration constraint
+    # Maximum Shift Duration Constraint
     for i in range(len(F)):
         a_i = G.nodes[i]['flight'].arr_min
-        m.addConstr(a_i - S[i] <= H, name=f"shift_limit_{i}")
+        m.addConstr(a_i - S[i] <= H, name=f"Max-Shift_{i}")
 
     # Objective: minimize number of crew (source arcs used)
     m.setObjective(
@@ -78,103 +80,130 @@ def build_model(F, G, max_shift, model_name="CrewAssignment"):
 
     return m, x, S
 
-def solve_cabin_crew(F):
-    transfer_time = config.MIN_TRANSFER_TIME + config.DELAY_BUFFER
 
+def solve(F, crew_type):
+    if crew_type == "pilot":
+        results = {}
+        
+        for aircraft_type in sorted(set(f.plane_type for f in F)):
+            F_q = [f for f in F if f.plane_type == aircraft_type]
+            
+            if len(F_q) == 0:
+                continue
+            
+            results[aircraft_type] = solve_helper(F_q, f"Pilots_{aircraft_type}")
+        
+        return results
+    else:
+        return {"all": solve_helper(F, "Cabin_Crew")}
+
+
+def solve_helper(F, model_name):
+    transfer_time = config.MIN_TRANSFER_TIME + config.DELAY_BUFFER
     G = build_network(F, transfer_time)
-    m, x, S = build_model(F, G, config.MAX_SHIFT_TIME, model_name="CabinCrew")
+    m, x, S = build_model(F, G, config.MAX_SHIFT_TIME, model_name=model_name)
     m.optimize()
-
-    return m, F, G, x, S
     
-def solve_pilots(F, P):
-    transfer_time = config.MIN_TRANSFER_TIME + config.DELAY_BUFFER
-    results = {}
-
-    # Get set of aircraft types that actually appear in the flight schedule
-    types_in_schedule = set(f.plane_type for f in F)
-
-    for aircraft_type in types_in_schedule:
-        # Filter flights to only this aircraft type
-        F_q = [f for f in F if f.plane_type == aircraft_type]
-
-        if len(F_q) == 0:
-            continue
-
-        G_q = build_network(F_q, transfer_time)
-        m, x, S = build_model(F_q, G_q, config.MAX_SHIFT_TIME,
-                              model_name=f"Pilots_{aircraft_type}")
-        m.optimize()
-
-        results[aircraft_type] = (m, F_q, G_q, x, S)
-
+    results = {"m": m, "F": F, "G": G, "x": x, "S": S, "Count": 0, "Routes": [], "Shifts": []}
+    
+    if m.Status == gurobi.GRB.OPTIMAL:
+        results["Count"] = int(m.ObjVal)
+        results["Routes"] = save_routes(F, G, x)
+        results["Shifts"] = save_shifts(F, G, x, S)
+        
     return results
 
-def run(show_crew_count, show_routes, show_shift_times, save_output, flight_file=None):
-    F = utils.load_flights(flight_file or config.IN_FLIGHTS)
 
-    # --- Cabin Crew ---
-    print("=" * 50)
-    print("CABIN CREW MODEL")
-    print("=" * 50)
+def save_routes(F, G, x):
+    routes = []
+    
+    for i in range(len(F)):
+        if x[("s", i)].X > 0.5:
+            route = []
+            current = i
+            
+            while current != "t":
+                route.append(G.nodes[current]['flight'])
+                
+                for v in G.successors(current):
+                    if x[(current, v)].X > 0.5:
+                        current = v
+                        break
+                    
+            routes.append(route)
+            
+    return routes
+ 
+ 
+def save_shifts(F, G, x, S):
+    shifts = []
+    
+    for i in range(len(F)):
+        if x[("s", i)].X > 0.5:
+            route_indices = []
+            current = i
+            
+            while current != "t":
+                route_indices.append(current)
+                
+                for v in G.successors(current):
+                    if x[(current, v)].X > 0.5:
+                        current = v
+                        break
+                    
+            clock_in = S[route_indices[0]].X
+            clock_out = F[route_indices[-1]].arr_min
+            shifts.append((clock_in, clock_out))
+        
+    return shifts
 
-    cabin_m, cabin_F, cabin_G, cabin_x, cabin_S = solve_cabin_crew(F)
 
-    if cabin_m.status == gurobi.GRB.INFEASIBLE:
-        print("INFEASIBLE - Computing IIS...")
-        cabin_m.computeIIS()
-        for c in cabin_m.getConstrs():
-            if c.IISConstr:
-                print(f"  {c.ConstrName}")
-    elif cabin_m.status == gurobi.GRB.OPTIMAL:
-        if show_crew_count:
-            utils.print_crew_count(cabin_m)
-        if show_routes:
-            utils.print_routes(cabin_F, cabin_G, cabin_x)
-        if show_shift_times:
-            utils.print_shift_times(cabin_F, cabin_S)
-    else:
-        print("No optimal solution found. Status:", cabin_m.status)
+def check_feasibility(label, result):
+    m = result["m"]
+    
+    if m.Status == gurobi.GRB.OPTIMAL:
+        return True
 
-    # --- Pilots ---
-    if config.SOLVE_PILOTS:
-        P = utils.load_airplanes(config.IN_AIRPLANES)
+    print(f"\n  {label}: INFEASIBLE")
+    m.computeIIS()
 
-        print("\n" + "=" * 50)
-        print("PILOT MODELS")
-        print("=" * 50)
+    for c in m.getConstrs():
+        if c.IISConstr:
+            print(f"    {c.ConstrName}")
+    
+    return False
 
-        pilot_results = solve_pilots(F, P)
-        total_pilots = 0
 
-        for aircraft_type, (m, F_q, G_q, x, S) in pilot_results.items():
-            print(f"\n--- {aircraft_type} ---")
-
-            if m.status == gurobi.GRB.INFEASIBLE:
-                print(f"  INFEASIBLE - Computing IIS...")
-                m.computeIIS()
-                for c in m.getConstrs():
-                    if c.IISConstr:
-                        print(f"    {c.ConstrName}")
-            elif m.status == gurobi.GRB.OPTIMAL:
-                total_pilots += int(m.objVal)
-                if show_crew_count:
-                    print(f"  Pilots needed: {int(m.objVal)}")
-                if show_routes:
-                    utils.print_routes(F_q, G_q, x)
-                if show_shift_times:
-                    utils.print_shift_times(F_q, S)
-            else:
-                print(f"  No optimal solution found. Status: {m.status}")
-
-        if show_crew_count:
-            print(f"\nTotal pilots across all types: {total_pilots}")
-
-    # --- Summary ---
-    if show_crew_count and config.SOLVE_PILOTS:
-        if cabin_m.status == gurobi.GRB.OPTIMAL:
-            print("\n" + "=" * 50)
-            print(f"TOTAL CREW: {int(cabin_m.objVal) + total_pilots}")
-            print(f"  Cabin crew: {int(cabin_m.objVal)}")
-            print(f"  Pilots:     {total_pilots}")
-            print("=" * 50)
+def run(flight_file):
+    csv_name = os.path.splitext(os.path.basename(flight_file))[0]
+    F = utils.load_flights(flight_file)
+    
+    print(f"\nSolving {csv_name} ({len(F)} flights) ...")
+    
+    cabin_crew_results = solve(F, "cabin")
+    pilot_results = solve(F, "pilot")
+    
+    for item, result in cabin_crew_results.items():
+        if not check_feasibility(f"Cabin Crew ({item})", result):
+            print("Cabin Crew Model is infeasable, fix model or change dataset")
+            return None
+    
+    for airplane, result in pilot_results.items():
+        if not check_feasibility(f"Pilot Model ({airplane})", result):
+            print(f"Pilot Model ({airplane}) is infeasable, fix model or change dataset")
+            return None
+    
+    total_cabin_crew = sum(r["Count"] for r in cabin_crew_results.values())
+    total_pilots = sum(r["Count"] for r in pilot_results.values())
+    total_crew = total_pilots + total_cabin_crew
+    
+    return {
+        "csv_name": csv_name,
+        "num_flights": len(F),
+        "cabin": cabin_crew_results,
+        "pilots": pilot_results,
+        "total_cabin": total_cabin_crew,
+        "total_pilots": total_pilots,
+        "total_crew": total_crew,
+    }
+    

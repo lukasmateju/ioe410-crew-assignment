@@ -5,30 +5,34 @@
 Main driver program for optimation model.
 """
 
-#import pandas as pd
-
-#import utils
-#import config
 import sys
 import sc_model
+import utils
 
-# --- Output toggles ---
-SHOW_CREW_COUNT  = True
-SHOW_ROUTES      = True
-SHOW_SHIFT_TIMES = False
-SAVE_OUTPUT      = "--save" in sys.argv
-
-# --- Flight schedule (first non-flag argument, or config default) ---
+# Flight Schedule CSV File and Save Argument Parsing
+save_output = "--save" in sys.argv
 flight_file = None
 for arg in sys.argv[1:]:
     if not arg.startswith("--"):
         flight_file = arg
         break
 
-# --- Run ---
-sc_model.run(SHOW_CREW_COUNT, SHOW_ROUTES, SHOW_SHIFT_TIMES, SAVE_OUTPUT, flight_file=flight_file)
+if flight_file is None:
+    sys.exit(1)
+
+# Model Run Function
+results = sc_model.run(flight_file)
+
+# If we have infeasable result, exit
+if results is None:
+    sys.exit(1)
 
 
-# --- Data Visualization ---
+# Data Visualization
 
 
+
+
+
+if save_output:
+    utils.save_output(results)
