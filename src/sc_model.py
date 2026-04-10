@@ -33,7 +33,7 @@ def build_network(F):
         for j in range(len(F)):
             if i != j:
                 if (F[i].destination == F[j].origin and F[i].arr_min + config.MIN_TRANSFER_TIME <= F[j].dep_min 
-                    #and F[j].arr_min - F[i].dep_min <= config.MAX_SHIFT_HOURS
+                    #and F[j].arr_min - F[i].dep_min <= config.MAX_SHIFT_TIME
                    ):
                     G.add_edge(i, j)
 
@@ -45,7 +45,7 @@ def build_network(F):
 
 def build_model(F, G):
     m = gurobi.Model("CrewAssignment")
-    H = config.MAX_SHIFT_HOURS
+    H = config.MAX_SHIFT_TIME
     
     # Arc variables x[(i,j)] for every edge in G
     x = {}

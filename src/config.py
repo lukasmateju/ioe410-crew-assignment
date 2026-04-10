@@ -11,11 +11,12 @@ IN_AIRPORTS  = "../data/flight-schedules/airports.csv"
 IN_AIRPLANES = "../data/flight-schedules/airplanes.csv"
 
 # Crew Behavior Settings
-MAX_SHIFT_HOURS = 11 * 60
+MAX_SHIFT_TIME = 11 * 60 #FIX THIS NAME
 MIN_TRANSFER_TIME = 1 * 60
-ENFORCE_SAME_START_END = False
-MULTIPLE_AIRPLANE_TYPES = False
-MULTIPLE_CREW_TYPES = False
+ENFORCE_SAME_START_END = False   #IMPLEMENT THIS
+MULTIPLE_CREW_TYPES = True       #IMPLEMENT THIS
+MULTIPLE_AIRPLANE_TYPES = False  #IMPLEMENT THIS
+CREW_RENDUNDANCY = True          #IMPLEMENT THIS
 # Other restriction ideas
 #  - Mandatory crew breaks (30 extra minutes without flight during shift)
 #  - Pilot certification restrictions (If using multiple crew types, pilots can only operate x types of planes)
