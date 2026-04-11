@@ -110,6 +110,7 @@ A compatibility arc from flight $i$ to flight $j$ exists when three conditions a
 | **Shift Start Propagation** *(upper)* | $S_j \leq S_i + H(1 - x_{ij}) \quad \forall (i,j) \in A^{\text{c}}$ | When $x_{ij} = 1$ (same crew member operates flight $i$ then flight $j$), this forces $S_j \leq S_i$. When $x_{ij} = 0$, the constraint is relaxed and $S_i$, $S_j$ are independent. |
 | **Shift Start Propagation** *(lower)* | $S_j \geq S_i - H(1 - x_{ij}) \quad \forall (i,j) \in A^{\text{c}}$ | When $x_{ij} = 1$, this forces $S_j \geq S_i$. Together with the upper constraint, this gives $S_j = S_i$, meaning the shift start time carries forward unchanged along the crew member's route. Every flight in the same route shares the same $S$ value, which makes sense since both flights belong to the same workday. |
 | **Max Shift Duration** | $a_i - S_i \leq H \quad \forall i \in F$ | The arrival time of flight $i$ minus the crew member's shift start cannot exceed $H$ minutes. This ensures no crew member works longer than the maximum allowed shift length. |
+| **Same Start/End Airport** *(optional)* | $\sum_{i \in F : b_i = a} x_{s,i} = \sum_{i \in F : e_i = a} x_{i,t} \quad \forall a \in K$ | When enabled, the number of crew starting at airport $a$ must equal the number ending at airport $a$. Implemented by replacing $s, t$ with airport-indexed pairs $s_a, t_a$. |
 
 ### Cabin Crew Model Summary
 
@@ -135,7 +136,9 @@ $x_{ij} \in \{0,1\} \quad \forall (i,j) \in A$
 
 $S_i \geq 0,\ S_i \in \mathbb{R} \quad \forall i \in F$
 
-This base model is enough to solve the original problem prompt with a single crew type, one crew member per flight, and no same-start/end-airport requirement. In the following sections, we expand on this foundation in two ways. First, we adapt the model for pilots by restricting compatibility arcs to flights of the same aircraft type. Then, we improve the model by expanding flight nodes to handle multiple crew members per flight, replacing the single source and sink with airport-specific pairs to enforce same-start/end-airport, and incorporating robustness buffers for callouts and delays.
+When same-start/end is enabled, $s$ and $t$ are replaced with $s_a$ and $t_a$ for each airport $a \in K$, the source/sink arcs are restricted accordingly, and the objective becomes $\min \sum_{a \in K} \sum_{i \in F} x_{s_a, i}$. This follows the multiple sources/sinks approach from maximum flow (IOE 410 Lecture 10).
+
+This base model is enough to solve the original problem prompt with a single crew type, one crew member per flight, and optionally enforcing same-start/end-airport. In the following sections, we expand on this foundation in two ways. First, we adapt the model for pilots by restricting compatibility arcs to flights of the same aircraft type. Then, we improve the model by expanding flight nodes to handle multiple crew members per flight and incorporating robustness buffers for callouts and delays.
 
 ---
 
@@ -180,6 +183,8 @@ A compatibility arc from flight $i$ to flight $j$ within sub-network $G_q$ exist
  **3.** $a_i + \delta \leq d_j$ - There is enough time to transfer from flight $i$ to flight $j$
 
 The key difference from the cabin crew model is that these arcs only exist between flights of the same aircraft type. A B737 pilot finishing a flight at ORD can only connect to another B737 flight departing from ORD, even if an A320 flight departs sooner with a valid transfer time.
+
+The same-start/end-airport policy works identically to the cabin crew model. When enabled (`ENFORCE_SAME_START_END_PILOTS`), each sub-network $G_q$ uses airport-indexed sources and sinks instead of a single $s$ and $t$. A B737 pilot who starts at ORD must end at ORD, but this is enforced independently within the B737 sub-network. This can be toggled separately from the cabin crew setting since pilot and cabin crew scheduling policies may differ in practice.
 
 ### Pilot Sub-Model Summary (for aircraft type $q$)
 
@@ -302,7 +307,6 @@ A compatibility arc from flight-slot $(i,k)$ to flight-slot $(j,l)$ exists when 
 | **Shift Start Propagation** *(upper)* | $S_{(j,l)} \leq S_{(i,k)} + H(1 - x_{(i,k),(j,l)}) \quad \forall ((i,k),(j,l)) \in A^{\text{c}}$ | When $x_{(i,k),(j,l)} = 1$ (same crew member operates both slots), forces $S_{(j,l)} \leq S_{(i,k)}$. |
 | **Shift Start Propagation** *(lower)* | $S_{(j,l)} \geq S_{(i,k)} - H(1 - x_{(i,k),(j,l)}) \quad \forall ((i,k),(j,l)) \in A^{\text{c}}$ | Combined with the upper constraint, this gives $S_{(j,l)} = S_{(i,k)}$, carrying the shift start time forward along the route. |
 | **Max Shift Duration** | $a_i - S_{(i,k)} \leq H \quad \forall (i,k) \in \hat{F}$ | The arrival time of flight $i$ minus the crew member's shift start cannot exceed $H$ minutes. |
-| **Symmetry Breaking** *(optional)* | $S_{(i,1)} \leq S_{(i,2)} \leq \cdots \leq S_{(i,r_i)} \quad \forall i \in F$ | Slots within the same flight are interchangeable, so this ordering constraint assigns earlier-starting crew to lower-numbered slots. This helps the solver prune equivalent solutions without changing the optimal objective value. |
 
 ### Full Flight Schedule Model Summary
 
@@ -324,8 +328,6 @@ $S_{(j,l)} \geq S_{(i,k)} - H(1 - x_{(i,k),(j,l)}) \quad \forall ((i,k),(j,l)) \
 
 $a_i - S_{(i,k)} \leq H \quad \forall (i,k) \in \hat{F}$
 
-$S_{(i,1)} \leq S_{(i,2)} \leq \cdots \leq S_{(i,r_i)} \quad \forall i \in F$
-
 $x_{ij} \in \{0,1\} \quad \forall (i,j) \in A$
 
 $S_{(i,k)} \geq 0,\ S_{(i,k)} \in \mathbb{R} \quad \forall (i,k) \in \hat{F}$
@@ -333,5 +335,25 @@ $S_{(i,k)} \geq 0,\ S_{(i,k)} \in \mathbb{R} \quad \forall (i,k) \in \hat{F}$
 We run this model once for cabin crew (using $r_i^{\text{min}}$ and $r_i^{\text{max}}$ from the aircraft data) and once for each aircraft type's pilots (using $r_i^{\text{pilot}}$ within each type-specific sub-network from the pilot model). The total crew for the full flight schedule is:
 
 $$\text{Total crew} = \text{Cabin crew total} + \sum_{q \in P} \text{Pilot total for type } q$$
+
+---
+
+## Deadhead Assignment (Post-Processing)
+
+When the same-start/end-airport constraint is not enforced, a pilot may end their shift at a different airport than where they started. In practice, that pilot needs to get back to their home airport before the next day. A **deadhead** is a repositioning flight where the pilot rides as a passenger on an existing scheduled flight to return to their starting airport.
+
+Deadhead assignment is handled as a post-processing step after the optimization model has been solved. It is not part of the IP formulation itself. For each pilot route where the last flight's destination does not match the first flight's origin, we search the full flight schedule for a valid repositioning flight.
+
+A flight $f$ is a valid deadhead for a pilot route if all three conditions are met:
+
+ **1.** $b_f = e_{\text{last}}$ - The deadhead departs from the airport where the pilot's last flight arrived
+
+ **2.** $e_f = b_{\text{first}}$ - The deadhead arrives at the airport where the pilot's first flight departed
+
+ **3.** $d_f \geq a_{\text{last}} + \delta$ - The deadhead departs at least $\delta$ minutes after the pilot's last flight arrives (minimum transfer time)
+
+We also check that the deadhead would not cause the pilot's total shift to exceed $H$ minutes (measured from their original clock-in to the deadhead's arrival). If multiple valid deadheads exist, we pick the one with the earliest departure. If no valid deadhead exists, the pilot requires an overnight stay at the destination airport.
+
+This is only applied to pilot routes since pilots must return to a base where they can fly their certified aircraft type. Cabin crew deadheads could be added in a similar way but are not currently implemented.
 
 ---

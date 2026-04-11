@@ -21,6 +21,7 @@ def build_network(F, transfer_time, slots_per_flight, enforce_same_start_end):
         airports.add(f.origin)
         airports.add(f.destination)
         
+    # TO-DO add in start end flagging code
     if enforce_same_start_end:
         for a in airports:
             G.add_node(("s", a))
@@ -69,7 +70,7 @@ def build_model(F, G, max_shift, slots_per_flight, enforce_same_start_end, model
     m.setParam("TimeLimit", config.TIME_LIMIT)
     m.setParam("MIPGap", config.MIP_GAP)
     H = max_shift
-
+    
     slot_nodes = [n for n in G.nodes() if is_slot(n)]
     
     if enforce_same_start_end:
@@ -77,17 +78,16 @@ def build_model(F, G, max_shift, slots_per_flight, enforce_same_start_end, model
     else:
         source_nodes = ["s"]
     
-    # Arc variables x[(i,j)] for every edge in G
+    # Arc variables
     x = {}
     for (i, j) in G.edges():
         x[(i, j)] = m.addVar(vtype=gurobi.GRB.BINARY, name=f"x_{i}_{j}")
     
-    # Shift start variables S[i] for every flight node
+    # Shift start variables 
     S = {}
     for (i, k) in slot_nodes:
         S[(i, k)] = m.addVar(lb=0.0, vtype=gurobi.GRB.CONTINUOUS, name=f"S_{i}_{k}")
 
-    # why do we do this ---------------------------------------------------------------------------------------------------------
     m.update()
 
     # Flow Balance Constraint
@@ -99,7 +99,7 @@ def build_model(F, G, max_shift, slots_per_flight, enforce_same_start_end, model
     for (i, k) in slot_nodes:
         d_i = F[i].dep_min
         
-        # why do we do this ---------------------------------------------------------------------------------------------------------
+        # TO-DO add in start end flagging code
         if enforce_same_start_end:
             src = ("s", F[i].origin)
         else:
@@ -221,7 +221,7 @@ def save_shifts(F, G, x, S):
             first_slot = j
             current = j
 
-            # Walk to find the last slot in this route
+            # Find last slot in route
             while not is_sink(current):
                 last_slot = current
                 
