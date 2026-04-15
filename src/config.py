@@ -20,12 +20,12 @@ ENFORCE_SAME_START_END_CABIN = True
 ENFORCE_SAME_START_END_PILOTS = True
 
 # Redundancy Buffer Multipliers
-CALLOUT_RATE = 0.0
-DELAY_BUFFER = 0
+CALLOUT_RATE = 0.05
+DELAY_BUFFER = 15
 
 # Solver Settings
-TIME_LIMIT = 600
-MIP_GAP = 0.05
+TIME_LIMIT = 120
+MIP_GAP = 0.10
 
 # Other restriction ideas
 #  - Mandatory crew breaks (30 extra minutes without flight during shift)

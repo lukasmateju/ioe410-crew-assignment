@@ -43,7 +43,7 @@ def assign_deadheads(results, flight_file):
             end = route[-1].destination
             end_time = route[-1].arr_min
             clock_in = shift[0]
- 
+            
             if start == end:
                 deadheads.append(None)
                 continue
@@ -135,19 +135,19 @@ def print_results(results):
     for atype in sorted(results["pilots"].keys()):
         print(f"    Pilots ({atype}): {results['pilots'][atype]['Count']}")
     print(f"    Pilots total: {results['total_pilots']}")
-    print(f"    --------------------")
+    print("    --------------------")
     print(f"    TOTAL CREW:   {results['total_crew']}")
     print("-" * 60)
     print()
  
-def save_output(results):
-    os.makedirs("../output", exist_ok=True)
-    out_path = os.path.join("../output", results['csv_name'] + "_results.txt")
-    
-    with open(out_path, 'w') as f:
-        old_stdout = sys.stdout
-        sys.stdout = f
-        print_results(results)
-        sys.stdout = old_stdout
-    
-    print(f"  Output saved to: {out_path}")
+#def save_output(results):
+#    os.makedirs("../output", exist_ok=True)
+#    out_path = os.path.join("../output", results['csv_name'] + "_results.txt")
+#    
+#    with open(out_path, 'w') as f:
+#        old_stdout = sys.stdout
+#        sys.stdout = f
+#        print_results(results)
+#        sys.stdout = old_stdout
+#    
+#    print(f"  Output saved to: {out_path}")

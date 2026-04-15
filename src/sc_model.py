@@ -66,7 +66,7 @@ def build_network(F, transfer_time, slots_per_flight, enforce_same_start_end):
 
 def build_model(F, G, max_shift, slots_per_flight, enforce_same_start_end, model_name):
     m = gurobi.Model(model_name)
-    m.setParam("OutputFlag", 0)
+    #m.setParam("OutputFlag", 0)
     m.setParam("TimeLimit", config.TIME_LIMIT)
     m.setParam("MIPGap", config.MIP_GAP)
     H = max_shift
@@ -83,7 +83,7 @@ def build_model(F, G, max_shift, slots_per_flight, enforce_same_start_end, model
     for (i, j) in G.edges():
         x[(i, j)] = m.addVar(vtype=gurobi.GRB.BINARY, name=f"x_{i}_{j}")
     
-    # Shift start variables 
+    # Shift start variables
     S = {}
     for (i, k) in slot_nodes:
         S[(i, k)] = m.addVar(lb=0.0, vtype=gurobi.GRB.CONTINUOUS, name=f"S_{i}_{k}")
