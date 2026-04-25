@@ -24,8 +24,9 @@ CALLOUT_RATE = 0.05
 DELAY_BUFFER = 15
 
 # Solver Settings
+SOLVER_BACKEND = "auto"  # auto, gurobi, scipy
 TIME_LIMIT = 120
-MIP_GAP = 0.10
+MIP_GAP = 0.075
 
 # Other restriction ideas
 #  - Mandatory crew breaks (30 extra minutes without flight during shift)

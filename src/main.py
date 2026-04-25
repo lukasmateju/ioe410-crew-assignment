@@ -11,6 +11,7 @@ import utils
 
 # Flight Schedule CSV File and Save Argument Parsing
 save_output = "--save" in sys.argv
+show_viz = "--viz" in sys.argv
 flight_file = None
 for arg in sys.argv[1:]:
     if not arg.startswith("--"):
@@ -30,8 +31,7 @@ if results is None:
 # Data Output and Visualization
 #utils.assign_deadheads(results, flight_file)
 
-utils.print_results(results)
+utils.print_results(results, show_viz=show_viz)
 
-#if save_output:
-#    utils.save_output(results)
-
+if save_output:
+    utils.save_output(results, show_viz=show_viz)

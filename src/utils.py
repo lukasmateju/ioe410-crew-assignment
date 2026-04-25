@@ -7,7 +7,7 @@ Helper functions for results output, file read-in, and visualization code for op
 
 import pandas as pd
 import os
-import sys
+from contextlib import redirect_stdout
 import config
 
 
@@ -108,7 +108,7 @@ def print_section(title, result, label="Crew"):
                       f"({dh.plane_type})")
  
  
-def print_results(results):
+def print_results(results, show_viz=False):
     if results is None:
         return
  
@@ -118,6 +118,7 @@ def print_results(results):
     print(f"  Schedule:     {results['csv_name']}")
     print(f"  Flights:      {results['num_flights']}")
     print(f"  Total crew:   {results['total_crew']}")
+    print(f"  Solver:       {solver_summary(results)}")
     # print(f"  Config:       shift={config.MAX_SHIFT_TIME}min, transfer={config.MIN_TRANSFER_TIME}min")
     print("=" * 60)
  
@@ -138,16 +139,107 @@ def print_results(results):
     print("    --------------------")
     print(f"    TOTAL CREW:   {results['total_crew']}")
     print("-" * 60)
+
+    if show_viz:
+        print_cli_visualizations(results)
+
     print()
  
-#def save_output(results):
-#    os.makedirs("../output", exist_ok=True)
-#    out_path = os.path.join("../output", results['csv_name'] + "_results.txt")
-#    
-#    with open(out_path, 'w') as f:
-#        old_stdout = sys.stdout
-#        sys.stdout = f
-#        print_results(results)
-#        sys.stdout = old_stdout
-#    
-#    print(f"  Output saved to: {out_path}")
+
+def solver_summary(results):
+    backends = set()
+
+    for result in results["cabin"].values():
+        backends.add(result["solver"].backend)
+
+    for result in results["pilots"].values():
+        backends.add(result["solver"].backend)
+
+    return ", ".join(sorted(backends))
+
+
+def save_output(results, show_viz=False):
+    os.makedirs("../output", exist_ok=True)
+    out_path = os.path.join("../output", results['csv_name'] + "_results.txt")
+
+    with open(out_path, 'w') as f:
+        with redirect_stdout(f):
+            print_results(results, show_viz=show_viz)
+
+    print(f"  Output saved to: {out_path}")
+
+
+def print_cli_visualizations(results):
+    print()
+    print("-" * 60)
+    print("  QUICK VISUALS")
+    print("-" * 60)
+    print_crew_mix_chart(results)
+    print_route_length_chart(results)
+    print_airport_flow_chart(results)
+
+
+def print_crew_mix_chart(results):
+    values = [("Cabin", results["total_cabin"])]
+
+    for atype in sorted(results["pilots"].keys()):
+        values.append((f"Pilot {atype.strip()}", results["pilots"][atype]["Count"]))
+
+    print("\n  Crew by group")
+    print_bar_chart(values)
+
+
+def print_route_length_chart(results):
+    buckets = {}
+
+    for label, result in iter_result_groups(results):
+        route_lengths = [len(route) for route in result["Routes"]]
+        if route_lengths:
+            buckets[label] = sum(route_lengths) / len(route_lengths)
+
+    print("\n  Average flights per route")
+    print_bar_chart([(label, value) for label, value in buckets.items()], width=24, precision=1)
+
+
+def print_airport_flow_chart(results):
+    flow_counts = {}
+
+    for _, result in iter_result_groups(results):
+        for route in result["Routes"]:
+            for flight in route:
+                key = f"{flight.origin.strip()}->{flight.destination.strip()}"
+                flow_counts[key] = flow_counts.get(key, 0) + 1
+
+    top_flows = sorted(flow_counts.items(), key=lambda item: (-item[1], item[0]))[:8]
+
+    print("\n  Busiest crew-covered flight legs")
+    print_bar_chart(top_flows, width=24)
+
+
+def print_bar_chart(values, width=28, precision=0):
+    if not values:
+        print("    No data")
+        return
+
+    max_value = max(value for _, value in values)
+    if max_value <= 0:
+        max_value = 1
+
+    label_width = min(max(len(label) for label, _ in values), 22)
+
+    for label, value in values:
+        bar_len = int(round((value / max_value) * width))
+        bar = "#" * max(1, bar_len)
+        if precision == 0:
+            value_text = str(int(round(value)))
+        else:
+            value_text = f"{value:.{precision}f}"
+        print(f"    {label[:label_width]:<{label_width}} | {bar:<{width}} {value_text}")
+
+
+def iter_result_groups(results):
+    for result in results["cabin"].values():
+        yield "Cabin", result
+
+    for atype in sorted(results["pilots"].keys()):
+        yield f"Pilot {atype.strip()}", results["pilots"][atype]

@@ -3,11 +3,102 @@
 
 ## Overview
 
-This project formulates and solves an airline crew assignment problem using mixed-integer linear programming in Python with Gurobi.
+This project formulates and solves an airline crew assignment problem using mixed-integer linear programming in Python. The model can use Gurobi when it is installed and licensed, and it can fall back to SciPy's open-source MILP solver when Gurobi is unavailable.
 
 The goal is to find the minimum number of crew members needed to operate all scheduled flights while satisfying operational constraints like maximum shift length, minimum connection time between flights, aircraft-specific crew requirements, a same-start/end-airport policy, and configurable buffers for crew callouts and delays.
 
 We model two distinct crew types, **cabin crew** and **pilots**, each with different rules and restrictions. These are solved as parallel optimization problems.
+
+---
+
+## Quick Start
+
+From the repository root:
+
+```bash
+make run-simple
+make run-normal
+make run-real
+```
+
+To run a specific schedule:
+
+```bash
+make run-file F=F14-stress.csv
+```
+
+To save the printed assignment summary:
+
+```bash
+make save-file F=F01-simple.csv
+```
+
+The program prints a full route assignment for cabin crew and pilots, including shift start/end times, route length, aircraft type, total crew count, and the solver backend used.
+
+---
+
+## Solver Compatibility
+
+The solver backend is configured in `src/config.py`:
+
+```python
+SOLVER_BACKEND = "auto"  # auto, gurobi, scipy
+```
+
+- `auto` uses Gurobi when `gurobipy` is installed and can create/solve a model; otherwise it falls back to SciPy MILP.
+- `gurobi` requires a working Gurobi installation and license.
+- `scipy` runs without a Gurobi license, using `scipy.optimize.milp`.
+
+The command-line workflow is unchanged:
+
+```bash
+make run-simple
+make run-normal
+make run-real
+```
+
+Output files can be written with:
+
+```bash
+make save-file F=F01-simple.csv
+```
+
+---
+
+## Command-Line Visualization
+
+For a compact visual summary in the terminal, add `--viz` when running `src/main.py` directly:
+
+```bash
+cd src
+python main.py ../data/flight-schedules/F01-simple.csv --viz
+```
+
+This appends three small ASCII charts to the usual route output:
+
+- crew count by group
+- average flights per route
+- busiest origin-destination legs by assigned crew coverage
+
+The visualization is intentionally text-only so it works in a normal terminal session, can be saved with `--save`, and can be pasted into notes or a report draft without requiring image files.
+
+---
+
+## Repository Structure
+
+```text
+data/
+  airplanes.csv              Aircraft-specific crew requirements
+  airports.csv               Airport reference data
+  flight-schedules/          Test and demonstration flight schedules
+src/
+  config.py                  Model, solver, and robustness settings
+  main.py                    Command-line entry point
+  sc_model.py                Network construction and optimization model
+  utils.py                   CSV loading, output formatting, and CLI visuals
+output/                      Saved run summaries
+docs/                        Planning notes and report addenda
+```
 
 ---
 
